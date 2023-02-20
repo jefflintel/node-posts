@@ -48,7 +48,8 @@ app.use((req, res, next) => {
     "Access-Control-Allow-Methods",
     "OPTIONS, GET, POST, PUT, PATCH, DELETE"
   );
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type", 
+  "Authorization");
   next();
 });
 
@@ -66,7 +67,20 @@ app.use((error, req, res, next) => {
 mongoose
   .connect(MONGOOSE_URI, { useUnifiedTopology: true, useNewUrlParser: true })
   .then((result) => {
-    app.listen(8080);
+    const server = app.listen(8080);
     console.log("connected to mongodb");
+    const io = require('./socket').init(server, 
+    //   {
+    //   cors: {
+    //     origin: 'http://localhost:3000',
+    //     methods: ['OPTIONS', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    //     allowedHeaders: ['*'],
+    //     credentials: true
+    //   }
+    // }
+    );
+    io.on('connection', socket => {
+      console.log('Client connected');
+    }); 
   })
   .catch((err) => console.log(err));
